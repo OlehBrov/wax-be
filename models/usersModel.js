@@ -6,8 +6,14 @@ const userSchema = new Schema({
     required: [true, "Email is required"],
     unique: true,
   },
+  password: {
+    type: String,
+    default: "",
+    required: true,
+  },
   roles: {
     type: Array,
+    default: ['user']
   },
   apiKey: {
     type: String,
@@ -26,6 +32,10 @@ const userSchema = new Schema({
   },
   updatedAt: {
     type: Date,
+    default: "",
+  },
+  token: {
+    type: String,
     default: "",
   },
 });

@@ -2,10 +2,10 @@ const express = require("express");
 const app = require('./app')
 const connectDB = require("./config/db_connect");
 const path = require("path");
-// const { HttpError } = require("./helpers");
+// const { httpError } = require("./helpers");
 // const configPath = path.join(__dirname, "config", ".env");
 require("dotenv").config();
-const { DB_HOST, PORT } = process.env;
+const { PORT } = process.env;
 
 
 app.use(
@@ -17,7 +17,7 @@ app.use(
 app.use(express.json());
 
 
-// app.use(HttpError);
+// app.use(httpError);
 
 connectDB();
 app.listen(PORT, () => {
