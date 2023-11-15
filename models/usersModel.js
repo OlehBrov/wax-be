@@ -1,4 +1,5 @@
 const { Schema, model } = require("mongoose");
+const procedure = require("./proceduresModel");
 
 const userSchema = new Schema({
   email: {
@@ -8,12 +9,11 @@ const userSchema = new Schema({
   },
   password: {
     type: String,
-    default: "",
-    required: true,
+    required: [true, "Set password for user"],
   },
   roles: {
     type: Array,
-    default: ['user']
+    default: ["user"],
   },
   apiKey: {
     type: String,
@@ -38,6 +38,30 @@ const userSchema = new Schema({
     type: String,
     default: "",
   },
+  currentOrders: [
+    {
+      date: { type: String },
+      time: { type: String },
+      orders: [
+        {
+          type: Schema.Types.ObjectId,
+          ref: "procedure",
+          default: [],
+        },
+      ],
+    },
+  ],
+  pastOrders: [
+    {
+      type: Schema.Types.ObjectId,
+      ref: "procedure",
+      default: [],
+    },
+  ],
 });
 
 module.exports = model("user", userSchema);
+
+/*
+[{date: 01/01/0101, orders: [{}, {}]}]
+*/

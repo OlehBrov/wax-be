@@ -42,13 +42,16 @@ const registerUser = async (req, res, next) => {
   }
 };
 
-const loginUser = async (req, res) => {
+const loginUser = async (req, res, next) => {
   const { email, password } = req.body;
-  const user = User.findOne({ email });
+
+  const user = await User.findOne({ email });
+
   if (!user) {
     throw httpError(401);
   }
   const checkPassword = await bcrypt.compare(password, user.password);
+
   if (!checkPassword) {
     throw httpError(401);
   }

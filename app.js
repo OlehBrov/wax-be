@@ -4,19 +4,18 @@ const cors = require("cors");
 const app = express();
 
 const usersRouter = require('./router/usersRouter')
+const ordersRouter = require('./router/ordersRouter')
 
 app.use(cors());
 app.use(express.json());
 
-app.get('/', (req, res) => {
-  res.send('Hello lllolojj!');
-});
 
 app.use('/api/users', usersRouter)
+app.use('/api/orders', ordersRouter)
 
 
 app.use((req, res) => {
-  res.status(404).json({ message: "Not found bbdbdbdb" });
+  res.status(404).json({ message: "Such page not found" });
 });
 
 app.use((err, req, res, next) => {
