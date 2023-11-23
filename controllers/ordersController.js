@@ -3,6 +3,8 @@ const User = require("../models/usersModel");
 const Procedure = require("../models/proceduresModel");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
+const { default: mongoose } = require("mongoose");
+
 require("dotenv").config();
 const { SECRET_KEY } = process.env;
 
@@ -37,29 +39,84 @@ const postOrders = async (req, res) => {
     orders: user.currentOrders,
   });
 };
+// const updateOrder = async (req, res, next) => {
+//   const { _id } = req.user;
+//   const { orderId, procedureId, data } = req.body;
+// };
+const deleteOrder = async (req, res, next) => {
+  const { _id } = req.user;
+  const { orderId } = req.body;
+  const result = await User.findOneAndUpdate(
+    { _id },
+    { $pull: { currentOrders: {_id: orderId} } },
+    { new: true }
+  );
 
-const deleteOrders = async (req, res, next) => {
+  if (!result) {
+    res.json({
+      message: "ERROR",
+    });
+  } else {
+    res.json({
+      message: "Deleted",
+      data: result.currentOrders
+    });
+  }
+};
+const deleteProcedure = async (req, res, next) => {
   const { _id } = req.user;
   const { orderId, procedureId } = req.body;
-  // const orders = req.body.orders.map((el) => el.id);
-  // const { date } = req.body;
-  // const orderDate = new Date(date).toLocaleDateString()
-  // console.log("localDate", localDate);
-  const oredrsCollection = await User.aggregate([
-    { $match: { _id: _id } },
+  const orderObjectId = new mongoose.Types.ObjectId(orderId);
+  const procedureObjectId = new mongoose.Types.ObjectId(procedureId);
+      
+        //delete procedure via aggregation
+  // const oredrsCollection = await User.updateMany([
+  //   {
+  //     $addFields: {
+  //       currentOrders: {
+  //         $map: {
+  //           input: "$currentOrders",
+  //           as: "curOrder",
+  //           in: {
+  //             $cond: {
+  //               if: {
+  //                 $eq: ["$$curOrder._id", orderObjectId],
+  //               },
+  //               then: {
+  //                 date: "$$curOrder.date",
+  //                 time: "$$curOrder.time",
+  //                 _id: "$$curOrder._id",
+  //                 orders: {
+  //                   $filter: {
+  //                     input: "$$curOrder.orders",
+  //                     as: "singleOrder",
+  //                     cond: { $ne: ["$$singleOrder", procedureObjectId] },
+  //                   },
+  //                 },
+  //               },
+  //               else: "$$curOrder",
+  //             },
+  //           },
+  //         },
+  //       },
+  //     },
+  //   },
+
+  // ]);
+  const oredrsCollection = await User.findOneAndUpdate(
     {
-      $project: {
-        currentOrders: {
-          $filter: {
-            input: "$currentOrders",
-            as: "order",
-            cond: { $eq: ["$$order._id", orderId ] },
-          },
-        },
+      _id: _id,
+      currentOrders: { $elemMatch: { _id: orderId } },
+    },
+    {
+      $pull: {
+        "currentOrders.$.orders": procedureObjectId,
       },
     },
-  ]);
-  console.log(oredrsCollection);
+
+    { new: true }
+  );
+
   if (!oredrsCollection) {
     res.json({
       message: "no such",
@@ -75,5 +132,6 @@ const deleteOrders = async (req, res, next) => {
 module.exports = {
   getOrders: ctrlWrapper(getOrders),
   postOrders: ctrlWrapper(postOrders),
-  deleteOrders: ctrlWrapper(deleteOrders),
+  deleteProcedure: ctrlWrapper(deleteProcedure),
+  deleteOrder: ctrlWrapper(deleteOrder),
 };

@@ -12,8 +12,9 @@ const userSchema = new Schema({
     required: [true, "Set password for user"],
   },
   roles: {
-    type: Array,
-    default: ["user"],
+    type: String,
+    enum: ["user", "admin"],
+    default: "user",
   },
   apiKey: {
     type: String,

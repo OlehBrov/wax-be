@@ -1,3 +1,4 @@
-const authenticate = require('./authenticate')
+const authenticate = require("./authenticate");
+const adminRoleCheck = require("./adminRoleCheck");
 
-module.exports = authenticate
+module.exports = { authenticate, adminRoleCheck };
